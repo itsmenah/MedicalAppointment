@@ -1,0 +1,43 @@
+.dashboard {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  background: #007bff;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.dashboard-section {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-section h2 {
+  margin-bottom: 10px;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+.btn {
+  background: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #218838;
+}
