@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #2c3e50; display: inline-block; }
+        .top-right { float: right; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background: #f2f2f2; }
+        .hidden { display: none; }
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: #fff; padding: 20px; border-radius: 5px; width: 400px;
+        }
+    </style>
+</head>
+<body>
+<h1>Patient Dashboard (ID: <span th:text="${user.userId}"></span>)</h1>
+<div class="top-right">
+    <button onclick="openModal()">Book Appointment</button>
+</div>
+
+<!-- Current Appointments -->
+<h2>My Current Appointments</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Doctor</th>
+        <th>Date & Time</th>
+        <th>Status</th>
+        <th>Token</th>
+    </tr>
+    <tr th:each="appt : ${currentAppointments}">
+        <td th:text="${appt.appointmentId}"></td>
+        <td th:text="${appt.doctor.name}"></td>
+        <td th:text="${appt.appointmentDate}"></td>
+        <td th:text="${appt.status}"></td>
+        <td th:text="${appt.tokenNumber}"></td>
+    </tr>
+</table>
+
+<!-- Toggle Past Appointments -->
+<button onclick="togglePast()">Show Past Appointments</button>
+<div id="pastAppts" class="hidden">
+    <h2>Past Appointments</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Doctor</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Token</th>
+        </tr>
+        <tr th:each="appt : ${pastAppointments}">
+            <td th:text="${appt.appointmentId}"></td>
+            <td th:text="${appt.doctor.name}"></td>
+            <td th:text="${appt.appointmentDate}"></td>
+            <td th:text="${appt.status}"></td>
+            <td th:text="${appt.tokenNumber}"></td>
+        </tr>
+    </table>
+</div>
+
+<!-- Modal for Booking Appointment -->
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <h2>Book Appointment</h2>
+        <form th:action="@{/patient/book}" method="post">
+            <input type="hidden" name="patientId" th:value="${user.userId}">
+            <label>Doctor:</label>
+            <select name="doctorId" required>
+                <option th:each="doc : ${doctors}" th:value="${doc.doctorId}" th:text="${doc.user.name}"></option>
+            </select><br><br>
+
+            <label>Date:</label>
+            <input type="date" name="date" required><br><br>
+
+            <label>Time:</label>
+            <input type="time" name="time" required><br><br>
+
+            <button type="submit">Book</button>
+            <button type="button" onclick="closeModal()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<!-- Success Message Popup -->
+<div id="successPopup" class="modal" th:if="${successMessage}">
+    <div class="modal-content">
+        <p th:text="${successMessage}"></p>
+        <button onclick="closeSuccess()">OK</button>
+    </div>
+</div>
+
+<script>
+    function togglePast() {
+        const div = document.getElementById("pastAppts");
+        div.classList.toggle("hidden");
+    }
+    function openModal() {
+        document.getElementById("bookingModal").style.display = "flex";
+    }
+    function closeModal() {
+        document.getElementById("bookingModal").style.display = "none";
+    }
+    function closeSuccess() {
+        document.getElementById("successPopup").style.display = "none";
+    }
+</script>
+</body>
+</html>
+x`

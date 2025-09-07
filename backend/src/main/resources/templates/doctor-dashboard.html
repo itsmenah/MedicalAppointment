@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Doctor Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h1>Doctor Dashboard (ID: <span th:text="${user.userId}"></span>)</h1>
+
+<h2>Appointments</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Patient</th>
+        <th>Date & Time</th>
+        <th>Status</th>
+    </tr>
+    <tr th:each="appt : ${appointments}">
+        <td th:text="${appt.appointmentId}"></td>
+        <td th:text="${appt.patient.name}"></td>
+        <td th:text="${appt.appointmentDate}"></td>
+        <td th:text="${appt.status}"></td>
+    </tr>
+</table>
+</body>
+</html>

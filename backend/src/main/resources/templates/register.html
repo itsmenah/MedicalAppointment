@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register - Medical Appointment</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        h1 { color: #2c3e50; }
+        .register-box {
+            margin: auto;
+            width: 320px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        input, select { padding: 10px; margin: 10px 0; width: 90%; }
+        button { padding: 10px 20px; background: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1f6690; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+<h1>Create Account</h1>
+
+<div class="register-box">
+    <form action="/register" method="post">
+        <input type="text" name="Email" placeholder="Enter Email" required><br>
+        <input type="password" name="password" placeholder="Enter Password" required><br>
+
+        <select name="role" required>
+            <option value="">-- Select Role --</option>
+            <option value="PATIENT">Patient</option>
+            <option value="DOCTOR">Doctor</option>
+        </select><br>
+
+        <button type="submit">Register</button>
+    </form>
+    <p th:if="${error}" th:text="${error}" class="error"></p>
+    <a href="/">Back to Login</a>
+</div>
+</body>
+</html>
