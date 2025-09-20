@@ -36,7 +36,7 @@ function Login({ onLogin }) {
     <div className="card">
       <div className="text-center">
         <h1>🏥 MedCare</h1>
-        <p>Smart Medical Appointments</p>
+        <p>Smart Medical Appointment System</p>
       </div>
 
       {error && <div className="error">{error}</div>}
@@ -66,12 +66,12 @@ function Login({ onLogin }) {
           />
         </div>
 
-        <button type="submit" className="btn" disabled={loading}>
+        <button type="submit" className="btn-primary" disabled={loading}>
           {loading ? "Signing in..." : "Sign In"}
         </button>
       </form>
 
-      <div className="text-center mt-1">
+      <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
         <Link to="/register" className="link">
           Don't have an account? Sign up
         </Link>

@@ -17,60 +17,81 @@ function PatientProfile({ user, onComplete, onSkip }) {
       await createPatient({
         ...formData,
         age: parseInt(formData.age),
-        user: user
+        user: {
+          userId: user.userId,
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          role: user.role
+        }
       });
       onComplete();
     } catch (err) {
-      console.error("Failed to create profile");
+      console.error("Failed to create profile:", err);
+      alert("Failed to save profile. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="profile-setup">
-      <div className="profile-card">
+    <div className="app">
+      <div className="card">
         <div className="profile-header">
-          <h2>Complete Your Profile</h2>
+          <h1>Complete Your Profile</h1>
           <button onClick={onSkip} className="close-btn">×</button>
         </div>
-        <p>Please provide additional information to continue</p>
+        <p>Please provide additional information to enhance your experience</p>
         
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
+          <div className="form-group">
+            <label>Age</label>
             <input
               type="number"
-              placeholder="Age"
+              placeholder="Enter your age"
               value={formData.age}
               onChange={(e) => setFormData({...formData, age: e.target.value})}
               required
+              min="1"
+              max="120"
             />
+          </div>
+          
+          <div className="form-group">
+            <label>Gender</label>
             <select
               value={formData.gender}
               onChange={(e) => setFormData({...formData, gender: e.target.value})}
               required
             >
-              <option value="">Gender</option>
+              <option value="">Select Gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
           </div>
           
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            required
-          />
+          <div className="form-group">
+            <label>Phone Number</label>
+            <input
+              type="tel"
+              placeholder="Enter your phone number"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              required
+            />
+          </div>
           
-          <textarea
-            placeholder="Address"
-            value={formData.address}
-            onChange={(e) => setFormData({...formData, address: e.target.value})}
-            required
-          />
+          <div className="form-group">
+            <label>Address</label>
+            <textarea
+              placeholder="Enter your address"
+              value={formData.address}
+              onChange={(e) => setFormData({...formData, address: e.target.value})}
+              required
+              rows="3"
+            />
+          </div>
           
           <div className="profile-actions">
             <button type="submit" className="btn-primary" disabled={loading}>

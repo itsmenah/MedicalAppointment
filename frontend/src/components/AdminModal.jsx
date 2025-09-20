@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { registerUser, createDoctor, getPatients, getDoctors, bookAppointment, updateUser, deleteUser, getPatientById, getDoctorById, createPatient } from "../services/api";
+import { registerUser, createDoctor, getPatients, getDoctors, bookAppointment, updateUser, deleteUser, getPatientByUserId, getDoctorByUserId, createPatient } from "../services/api";
 
 function AdminModal({ type, item, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -34,7 +34,7 @@ function AdminModal({ type, item, onClose, onSuccess }) {
   const loadUserDetails = async () => {
     try {
       if (item.role === "PATIENT") {
-        const patientRes = await getPatientById(item.userId);
+        const patientRes = await getPatientByUserId(item.userId);
         const patient = patientRes.data;
         setFormData(prev => ({
           ...prev,
@@ -45,7 +45,7 @@ function AdminModal({ type, item, onClose, onSuccess }) {
         }));
         setUserDetails(patient);
       } else if (item.role === "DOCTOR") {
-        const doctorRes = await getDoctorById(item.userId);
+        const doctorRes = await getDoctorByUserId(item.userId);
         setUserDetails(doctorRes.data);
       }
     } catch (err) {
@@ -72,7 +72,7 @@ function AdminModal({ type, item, onClose, onSuccess }) {
     e.preventDefault();
     try {
       if (type === "booking") {
-        const appointmentDateTime = `${formData.appointmentDate}T${formData.selectedDoctor?.availableFrom || '09:00'}:00`;
+        const appointmentDateTime = `${formData.appointmentDate}T${formData.selectedDoctor?.availableFrom || '09:00'}`;
         await bookAppointment({
           patientId: formData.patientId,
           doctorId: formData.doctorId,
@@ -120,15 +120,14 @@ function AdminModal({ type, item, onClose, onSuccess }) {
           });
           // Note: Doctor specialization/timing update would need updateDoctor API
         } else {
-          // Create new doctor
-          const userRes = await registerUser({
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            role: "DOCTOR"
-          });
+          // Create new doctor using createDoctor service which handles both user and doctor creation
           await createDoctor({
-            user: userRes.data,
+            user: {
+              name: formData.name,
+              email: formData.email,
+              password: formData.password,
+              role: "DOCTOR"
+            },
             specialization: formData.specialization,
             availableFrom: formData.availableFrom,
             availableTo: formData.availableTo
@@ -212,8 +211,8 @@ function AdminModal({ type, item, onClose, onSuccess }) {
               {formData.selectedDoctor && (
                 <div className="form-group">
                   <label>Doctor Availability</label>
-                  <div style={{ padding: '0.75rem', background: '#f0f9ff', borderRadius: '8px', fontSize: '0.9rem' }}>
-                    Available: {formData.selectedDoctor.availableFrom} - {formData.selectedDoctor.availableTo}
+                  <div className="doctor-availability">
+                    🕒 Available: {formData.selectedDoctor.availableFrom} - {formData.selectedDoctor.availableTo}
                   </div>
                 </div>
               )}

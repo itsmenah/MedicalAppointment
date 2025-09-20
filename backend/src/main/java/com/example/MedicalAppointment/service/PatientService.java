@@ -45,6 +45,10 @@ public class PatientService {
         return patientRepository.findByUser_Email(email);
     }
 
+    public Optional<Patient> getPatientByUserId(Long userId) {
+        return patientRepository.findByUser_UserId(userId);
+    }
+
 
     public Optional<Patient> updatePatient(Long id, Patient updatedPatient) {
         return patientRepository.findById(id).map(existingPatient -> {

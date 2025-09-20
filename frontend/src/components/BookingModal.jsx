@@ -29,7 +29,7 @@ function BookingModal({ doctors, onBook, onClose }) {
 
     try {
       // Create datetime using selected date and doctor's available time
-      const appointmentDateTime = `${formData.appointmentDate}T${selectedDoctor?.availableFrom || '09:00'}:00`;
+      const appointmentDateTime = `${formData.appointmentDate}T${selectedDoctor?.availableFrom || '09:00'}`;
       await onBook({
         doctorId: formData.doctorId,
         appointmentDateTime
@@ -76,8 +76,8 @@ function BookingModal({ doctors, onBook, onClose }) {
           {selectedDoctor && (
             <div className="form-group">
               <label>Doctor Availability</label>
-              <div style={{ padding: '0.75rem', background: '#f0f9ff', borderRadius: '8px', fontSize: '0.9rem' }}>
-                Available: {selectedDoctor.availableFrom} - {selectedDoctor.availableTo}
+              <div className="doctor-availability">
+                🕒 Available: {selectedDoctor.availableFrom} - {selectedDoctor.availableTo}
               </div>
             </div>
           )}

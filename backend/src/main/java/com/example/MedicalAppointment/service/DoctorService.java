@@ -40,4 +40,8 @@ public class DoctorService {
     public Optional<Doctor> getDoctorById(Long id) {
         return doctorRepository.findById(id);
     }
+
+    public Optional<Doctor> getDoctorByUserId(Long userId) {
+        return doctorRepository.findByUser_UserId(userId);
+    }
 }

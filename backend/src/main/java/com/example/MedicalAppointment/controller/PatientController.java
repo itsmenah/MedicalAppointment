@@ -36,6 +36,13 @@ public class PatientController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Patient> getPatientByUserId(@PathVariable Long userId) {
+        Optional<Patient> patient = patientService.getPatientByUserId(userId);
+        return patient.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 
     @GetMapping("/email/{email}")
     public ResponseEntity<Patient> getPatientByEmail(@PathVariable String email) {

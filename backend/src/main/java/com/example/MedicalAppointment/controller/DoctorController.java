@@ -33,4 +33,11 @@ public class DoctorController {
         return doctor.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Doctor> getDoctorByUserId(@PathVariable Long userId) {
+        Optional<Doctor> doctor = doctorService.getDoctorByUserId(userId);
+        return doctor.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

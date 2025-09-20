@@ -83,12 +83,12 @@ function Register() {
 
 
 
-        <button type="submit" className="btn" disabled={loading}>
+        <button type="submit" className="btn-primary" disabled={loading}>
           {loading ? "Creating Account..." : "Create Account"}
         </button>
       </form>
 
-      <div className="text-center mt-1">
+      <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
         <Link to="/" className="link">
           Already have an account? Sign in
         </Link>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getAppointmentsByPatient, getDoctors, bookAppointment } from "../services/api";
+import { getAppointmentsByPatient, getDoctors, bookAppointment, cancelAppointment } from "../services/api";
 import BookingModal from "./BookingModal";
 
 function PatientDashboard({ user }) {
@@ -39,6 +39,17 @@ function PatientDashboard({ user }) {
       loadData(); // Refresh appointments
     } catch (err) {
       throw new Error(err.response?.data?.message || "Booking failed");
+    }
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    if (window.confirm('Are you sure you want to cancel this appointment?')) {
+      try {
+        await cancelAppointment(appointmentId);
+        loadData(); // Refresh appointments
+      } catch (err) {
+        setError('Failed to cancel appointment');
+      }
     }
   };
 
@@ -89,7 +100,12 @@ function PatientDashboard({ user }) {
               </div>
             ) : (
               currentAppointments.map(appointment => (
-                <AppointmentCard key={appointment.appointmentId} appointment={appointment} />
+                <AppointmentCard 
+                  key={appointment.appointmentId} 
+                  appointment={appointment}
+                  onCancel={handleCancelAppointment}
+                  showActions={true}
+                />
               ))
             )}
           </div>
@@ -104,7 +120,11 @@ function PatientDashboard({ user }) {
               </div>
             ) : (
               pastAppointments.map(appointment => (
-                <AppointmentCard key={appointment.appointmentId} appointment={appointment} />
+                <AppointmentCard 
+                  key={appointment.appointmentId} 
+                  appointment={appointment}
+                  showActions={false}
+                />
               ))
             )}
           </div>
@@ -122,19 +142,49 @@ function PatientDashboard({ user }) {
   );
 }
 
-function AppointmentCard({ appointment }) {
+function AppointmentCard({ appointment, onCancel, showActions }) {
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString();
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
     <div className="appointment-item">
-      <h3>Dr. {appointment.doctor?.name || "Unknown"}</h3>
-      <p>📅 {formatDate(appointment.appointmentDate)}</p>
-      <p>🎫 Token: #{appointment.tokenNumber}</p>
-      <span className={`status status-${appointment.status.toLowerCase()}`}>
-        {appointment.status}
-      </span>
+      <div className="appointment-header">
+        <h3>Dr. {appointment.doctor?.name || "Unknown"}</h3>
+        <span className={`status status-${appointment.status.toLowerCase()}`}>
+          {appointment.status}
+        </span>
+      </div>
+      <div className="appointment-details">
+        <p>📅 {formatDate(appointment.appointmentDate)}</p>
+        <p>🕐 {formatTime(appointment.appointmentDate)}</p>
+        <p>🎫 Token: #{appointment.tokenNumber}</p>
+        {appointment.doctor?.specialization && (
+          <p>🩺 {appointment.doctor.specialization}</p>
+        )}
+      </div>
+      {showActions && appointment.status === 'BOOKED' && (
+        <div className="appointment-actions">
+          <button 
+            onClick={() => onCancel(appointment.appointmentId)}
+            className="btn btn-danger btn-small"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }

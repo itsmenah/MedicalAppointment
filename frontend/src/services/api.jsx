@@ -14,11 +14,13 @@ export const registerUser = (userData) => API.post("/auth/register", userData);
 // Doctor endpoints
 export const getDoctors = () => API.get("/doctors");
 export const getDoctorById = (id) => API.get(`/doctors/${id}`);
+export const getDoctorByUserId = (userId) => API.get(`/doctors/user/${userId}`);
 export const createDoctor = (doctorData) => API.post("/doctors", doctorData);
 
 // Patient endpoints
 export const getPatients = () => API.get("/patients");
 export const getPatientById = (id) => API.get(`/patients/${id}`);
+export const getPatientByUserId = (userId) => API.get(`/patients/user/${userId}`);
 export const createPatient = (patientData) => API.post("/patients", patientData);
 
 // Appointment endpoints

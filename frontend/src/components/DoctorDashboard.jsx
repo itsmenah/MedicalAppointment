@@ -56,9 +56,12 @@ function DoctorDashboard({ user }) {
   }
 
   return (
-    <div className="patient-grid">
+    <div className="doctor-grid">
       <div className="section">
-        <h2>Today's Appointments</h2>
+        <div className="section-header">
+          <h2>Today's Appointments</h2>
+          <span className="appointment-count">{todayAppointments.length}</span>
+        </div>
         {error && <div className="error">{error}</div>}
         
         <div className="appointment-list">
@@ -79,7 +82,10 @@ function DoctorDashboard({ user }) {
       </div>
 
       <div className="section">
-        <h2>Upcoming Appointments</h2>
+        <div className="section-header">
+          <h2>Upcoming Appointments</h2>
+          <span className="appointment-count">{upcomingAppointments.length}</span>
+        </div>
         <div className="appointment-list">
           {upcomingAppointments.length === 0 ? (
             <div className="empty-state">
@@ -102,39 +108,53 @@ function DoctorDashboard({ user }) {
 
 function DoctorAppointmentCard({ appointment, onStatusUpdate }) {
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString();
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
     <div className="appointment-item">
-      <h3>{appointment.patient?.name || "Unknown Patient"}</h3>
-      <p>📅 {formatDate(appointment.appointmentDate)}</p>
-      <p>🎫 Token: #{appointment.tokenNumber}</p>
-      <p>📧 {appointment.patient?.email}</p>
-      
-      <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <div className="appointment-header">
+        <h3>{appointment.patient?.name || "Unknown Patient"}</h3>
         <span className={`status status-${appointment.status.toLowerCase()}`}>
           {appointment.status}
         </span>
-        
-        {appointment.status === "BOOKED" && (
-          <>
-            <button 
-              onClick={() => onStatusUpdate(appointment.appointmentId, "DONE")}
-              className="btn btn-small"
-              style={{ background: '#28a745' }}
-            >
-              Mark Done
-            </button>
-            <button 
-              onClick={() => onStatusUpdate(appointment.appointmentId, "CANCELLED")}
-              className="btn btn-small btn-danger"
-            >
-              Cancel
-            </button>
-          </>
-        )}
       </div>
+      
+      <div className="appointment-details">
+        <p>📅 {formatDate(appointment.appointmentDate)}</p>
+        <p>🕐 {formatTime(appointment.appointmentDate)}</p>
+        <p>🎫 Token: #{appointment.tokenNumber}</p>
+        <p>📧 {appointment.patient?.email}</p>
+      </div>
+      
+      {appointment.status === "BOOKED" && (
+        <div className="appointment-actions">
+          <button 
+            onClick={() => onStatusUpdate(appointment.appointmentId, "DONE")}
+            className="btn btn-primary btn-small"
+          >
+            ✓ Mark Done
+          </button>
+          <button 
+            onClick={() => onStatusUpdate(appointment.appointmentId, "CANCELLED")}
+            className="btn btn-danger btn-small"
+          >
+            ✗ Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }

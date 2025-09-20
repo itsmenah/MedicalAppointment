@@ -3,7 +3,7 @@ import PatientDashboard from "./PatientDashboard";
 import DoctorDashboard from "./DoctorDashboard";
 import AdminDashboard from "./AdminDashboard";
 import PatientProfile from "./PatientProfile";
-import { getPatientById } from "../services/api";
+import { getPatientByUserId } from "../services/api";
 
 function Dashboard({ user, onLogout }) {
   const [needsProfile, setNeedsProfile] = useState(false);
@@ -19,7 +19,7 @@ function Dashboard({ user, onLogout }) {
 
   const checkPatientProfile = async () => {
     try {
-      const response = await getPatientById(user.userId);
+      const response = await getPatientByUserId(user.userId);
       if (response.data) {
         setLoading(false);
       } else {
@@ -46,10 +46,13 @@ function Dashboard({ user, onLogout }) {
 
   return (
     <div className="dashboard">
+      <div className="banner">
+        🏥 MedCare - Smart Medical Appointment System
+      </div>
       <div className="dashboard-header">
         <div>
           <h1>{user.name || user.email}</h1>
-          <span className="role-badge">{user.role}</span>
+          <span className={`role-badge ${user.role ? user.role.toLowerCase() : 'unknown'}`}>{user.role || 'Unknown'}</span>
         </div>
         <button onClick={onLogout} className="btn-logout">
           Logout
