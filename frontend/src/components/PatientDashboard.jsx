@@ -42,13 +42,21 @@ function PatientDashboard({ user }) {
     }
   };
 
-  const currentAppointments = appointments.filter(apt => 
-    new Date(apt.appointmentDate) >= new Date() || apt.status === "BOOKED"
-  );
+  const currentAppointments = appointments.filter(apt => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    const aptDate = new Date(apt.appointmentDate);
+    aptDate.setHours(0, 0, 0, 0); // Reset time to start of day
+    return aptDate >= today && apt.status === "BOOKED";
+  });
 
-  const pastAppointments = appointments.filter(apt => 
-    new Date(apt.appointmentDate) < new Date() && apt.status !== "BOOKED"
-  );
+  const pastAppointments = appointments.filter(apt => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    const aptDate = new Date(apt.appointmentDate);
+    aptDate.setHours(0, 0, 0, 0); // Reset time to start of day
+    return aptDate < today || apt.status !== "BOOKED";
+  });
 
   if (loading) {
     return (
@@ -60,13 +68,13 @@ function PatientDashboard({ user }) {
 
   return (
     <>
-      <div className="grid grid-2">
+      <div className="patient-grid">
         <div className="section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div className="section-header">
             <h2>Current Appointments</h2>
             <button 
               onClick={() => setShowBooking(true)} 
-              className="btn btn-small"
+              className="btn-primary"
             >
               Book New
             </button>

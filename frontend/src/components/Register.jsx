@@ -81,18 +81,7 @@ function Register() {
           />
         </div>
 
-        <div className="form-group">
-          <label>Role</label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-          >
-            <option value="PATIENT">Patient</option>
-            <option value="DOCTOR">Doctor</option>
-          </select>
-        </div>
+
 
         <button type="submit" className="btn" disabled={loading}>
           {loading ? "Creating Account..." : "Create Account"}

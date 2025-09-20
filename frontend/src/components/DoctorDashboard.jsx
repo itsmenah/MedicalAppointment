@@ -32,14 +32,18 @@ function DoctorDashboard({ user }) {
   };
 
   const todayAppointments = appointments.filter(apt => {
-    const today = new Date().toDateString();
-    const aptDate = new Date(apt.appointmentDate).toDateString();
-    return today === aptDate;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const aptDate = new Date(apt.appointmentDate);
+    aptDate.setHours(0, 0, 0, 0);
+    return today.getTime() === aptDate.getTime();
   });
 
   const upcomingAppointments = appointments.filter(apt => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const aptDate = new Date(apt.appointmentDate);
+    aptDate.setHours(0, 0, 0, 0);
     return aptDate > today;
   });
 
@@ -52,7 +56,7 @@ function DoctorDashboard({ user }) {
   }
 
   return (
-    <div className="grid grid-2">
+    <div className="patient-grid">
       <div className="section">
         <h2>Today's Appointments</h2>
         {error && <div className="error">{error}</div>}

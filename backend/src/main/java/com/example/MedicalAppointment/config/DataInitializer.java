@@ -4,11 +4,13 @@ import com.example.MedicalAppointment.entity.*;
 import com.example.MedicalAppointment.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 
 @Component
+@Order(2)
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired

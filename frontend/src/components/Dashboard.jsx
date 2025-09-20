@@ -1,24 +1,66 @@
+import { useState, useEffect } from "react";
 import PatientDashboard from "./PatientDashboard";
 import DoctorDashboard from "./DoctorDashboard";
+import AdminDashboard from "./AdminDashboard";
+import PatientProfile from "./PatientProfile";
+import { getPatientById } from "../services/api";
 
 function Dashboard({ user, onLogout }) {
+  const [needsProfile, setNeedsProfile] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user.role === "PATIENT") {
+      checkPatientProfile();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const checkPatientProfile = async () => {
+    try {
+      const response = await getPatientById(user.userId);
+      if (response.data) {
+        setLoading(false);
+      } else {
+        setNeedsProfile(true);
+        setLoading(false);
+      }
+    } catch (err) {
+      setNeedsProfile(true);
+      setLoading(false);
+    }
+  };
+
+  const handleProfileComplete = () => {
+    setNeedsProfile(false);
+  };
+
+  if (loading) {
+    return <div className="loading"><div className="spinner"></div></div>;
+  }
+
+  if (needsProfile) {
+    return <PatientProfile user={user} onComplete={handleProfileComplete} onSkip={handleProfileComplete} />;
+  }
+
   return (
-    <div className="card dashboard-card">
-      <div className="header">
+    <div className="dashboard">
+      <div className="dashboard-header">
         <div>
-          <h1>Welcome, {user.name || user.email}</h1>
-          <p>{user.role} Dashboard</p>
+          <h1>{user.name || user.email}</h1>
+          <span className="role-badge">{user.role}</span>
         </div>
-        <button onClick={onLogout} className="btn btn-danger btn-small">
+        <button onClick={onLogout} className="btn-logout">
           Logout
         </button>
       </div>
 
-      {user.role === "PATIENT" ? (
-        <PatientDashboard user={user} />
-      ) : (
-        <DoctorDashboard user={user} />
-      )}
+      <div className="dashboard-content">
+        {user.role === "ADMIN" && <AdminDashboard user={user} />}
+        {user.role === "PATIENT" && <PatientDashboard user={user} />}
+        {user.role === "DOCTOR" && <DoctorDashboard user={user} />}
+      </div>
     </div>
   );
 }
