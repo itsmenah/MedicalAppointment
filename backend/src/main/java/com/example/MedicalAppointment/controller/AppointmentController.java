@@ -40,6 +40,11 @@ public class AppointmentController {
     }
 
 
+    @GetMapping
+    public ResponseEntity<List<Appointment>> getAllAppointments() {
+        return ResponseEntity.ok(appointmentService.getAllAppointments());
+    }
+
     @GetMapping("/{appointmentId}")
     public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long appointmentId) {
         return ResponseEntity.ok(appointmentService.getAppointmentById(appointmentId));
@@ -54,6 +59,19 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.updateAppointmentStatus(appointmentId, status));
     }
 
+
+    @PutMapping("/{appointmentId}")
+    public ResponseEntity<Appointment> updateAppointment(
+            @PathVariable Long appointmentId,
+            @RequestBody AppointmentRequest request
+    ) {
+        return ResponseEntity.ok(appointmentService.updateAppointment(
+                appointmentId,
+                request.getPatientId(),
+                request.getDoctorId(),
+                request.getAppointmentDateTime()
+        ));
+    }
 
     @DeleteMapping("/{appointmentId}")
     public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId) {

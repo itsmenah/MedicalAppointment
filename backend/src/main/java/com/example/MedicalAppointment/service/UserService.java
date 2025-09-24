@@ -1,6 +1,9 @@
 package com.example.MedicalAppointment.service;
 
+import com.example.MedicalAppointment.entity.Patient;
+import com.example.MedicalAppointment.entity.Role;
 import com.example.MedicalAppointment.entity.User;
+import com.example.MedicalAppointment.repository.PatientRepo;
 import com.example.MedicalAppointment.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +17,23 @@ public class UserService {
     @Autowired
     private UserRepo userRepository;
 
+    @Autowired
+    private PatientRepo patientRepository;
+
 
     public User registerUser(User user) {
         // (Optional) Encrypt password before saving
         // user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // Auto-create patient record if role is PATIENT
+        if (savedUser.getRole() == Role.PATIENT) {
+            Patient patient = new Patient();
+            patient.setUser(savedUser);
+            patientRepository.save(patient);
+        }
+        
+        return savedUser;
     }
 
 

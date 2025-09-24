@@ -78,9 +78,30 @@ public class AppointmentService {
     }
 
 
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll();
+    }
+
+    public Appointment updateAppointment(Long appointmentId, Long patientId, Long doctorId, LocalDateTime appointmentDate) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        
+        User patient = userRepository.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+        User doctor = userRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+        
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentDate(appointmentDate);
+        
+        return appointmentRepository.save(appointment);
+    }
+
     public void cancelAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
-        appointmentRepository.delete(appointment);
+        appointment.setStatus(Status.CANCELLED);
+        appointmentRepository.save(appointment);
     }
 }

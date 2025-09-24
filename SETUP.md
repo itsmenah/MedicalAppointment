@@ -7,7 +7,7 @@
 cd backend
 ./mvnw spring-boot:run
 ```
-Backend runs on: https://medicalappointment-l2hk.onrender.com
+Backend runs on: http://localhost:8080/api/
 
 ### 2. Frontend (Terminal 2)
 ```bash

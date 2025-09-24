@@ -24,7 +24,7 @@ public interface AppointmentRepo extends JpaRepository<Appointment, Long> {
 
     @Query("SELECT MAX(a.tokenNumber) FROM Appointment a " +
             "WHERE a.doctor.userId = :doctorId " +
-            "AND CAST(a.appointmentDate AS DATE) = :date")
+            "AND DATE(a.appointmentDate) = :date")
     Integer findMaxTokenByDoctorAndDate(
             @Param("doctorId") Long doctorId,
             @Param("date") LocalDate date
