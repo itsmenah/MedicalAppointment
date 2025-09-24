@@ -29,7 +29,7 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-The backend will start on `http://localhost:8080/api/`
+The backend will start on `https://medicalappointment-l2hk.onrender.com/api/`
 
 ### Frontend Setup
 
@@ -141,7 +141,7 @@ MedicalAppointment/
 
 The application uses H2 in-memory database. Data is stored in `backend/data/` directory and persists between restarts.
 
-Access H2 Console: `http://localhost:8080/api//h2-console`
+Access H2 Console: `https://medicalappointment-l2hk.onrender.com/api//h2-console`
 - JDBC URL: `jdbc:h2:file:./data/medappdb`
 - Username: `sa`
 - Password: (empty)
