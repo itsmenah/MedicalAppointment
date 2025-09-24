@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://medicalappointment-l2hk.onrender.com/api",
+  baseURL: "http://localhost:8080/api/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,8 +39,13 @@ export const getAppointmentById = (appointmentId) =>
 export const updateAppointmentStatus = (appointmentId, status) => 
   API.put(`/appointments/${appointmentId}/status?status=${status}`);
 
+export const updateAppointment = (appointmentId, appointmentData) => 
+  API.put(`/appointments/${appointmentId}`, appointmentData);
+
 export const cancelAppointment = (appointmentId) => 
   API.delete(`/appointments/${appointmentId}`);
+
+export const getAllAppointments = () => API.get("/appointments");
 
 // User endpoints
 export const getAllUsers = () => API.get("/users");

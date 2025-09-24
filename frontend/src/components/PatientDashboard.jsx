@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getAppointmentsByPatient, getDoctors, bookAppointment, cancelAppointment } from "../services/api";
+import { getAppointmentsByPatient, getDoctors, bookAppointment, updateAppointmentStatus } from "../services/api";
 import BookingModal from "./BookingModal";
 
 function PatientDashboard({ user }) {
@@ -45,7 +45,7 @@ function PatientDashboard({ user }) {
   const handleCancelAppointment = async (appointmentId) => {
     if (window.confirm('Are you sure you want to cancel this appointment?')) {
       try {
-        await cancelAppointment(appointmentId);
+        await updateAppointmentStatus(appointmentId, 'CANCELLED');
         loadData(); // Refresh appointments
       } catch (err) {
         setError('Failed to cancel appointment');
@@ -66,7 +66,7 @@ function PatientDashboard({ user }) {
     today.setHours(0, 0, 0, 0); // Reset time to start of day
     const aptDate = new Date(apt.appointmentDate);
     aptDate.setHours(0, 0, 0, 0); // Reset time to start of day
-    return aptDate < today || apt.status !== "BOOKED";
+    return aptDate < today || apt.status === "CANCELLED" || apt.status === "DONE";
   });
 
   if (loading) {
@@ -112,7 +112,10 @@ function PatientDashboard({ user }) {
         </div>
 
         <div className="section">
-          <h2>Past Appointments</h2>
+          <div className="section-header">
+            <h2>Past & Cancelled Appointments</h2>
+            <span className="appointment-count">{pastAppointments.length}</span>
+          </div>
           <div className="appointment-list">
             {pastAppointments.length === 0 ? (
               <div className="empty-state">

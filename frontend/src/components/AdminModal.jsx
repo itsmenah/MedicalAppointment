@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { registerUser, createDoctor, getPatients, getDoctors, bookAppointment, updateUser, deleteUser, getPatientByUserId, getDoctorByUserId, createPatient } from "../services/api";
+import { registerUser, createDoctor, getPatients, getDoctors, bookAppointment, updateAppointment, updateAppointmentStatus, updateUser, deleteUser, getPatientByUserId, getDoctorByUserId, createPatient } from "../services/api";
 
 function AdminModal({ type, item, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
-    name: item?.name || item?.user?.name || "",
-    email: item?.email || item?.user?.email || "",
+    name: item?.name || item?.user?.name || item?.patient?.name || item?.doctor?.name || "",
+    email: item?.email || item?.user?.email || item?.patient?.email || item?.doctor?.email || "",
     password: "",
     role: item?.role || (type === "doctor" || type === "editDoctor" ? "DOCTOR" : "PATIENT"),
     specialization: item?.specialization || "",
@@ -14,9 +14,9 @@ function AdminModal({ type, item, onClose, onSuccess }) {
     gender: "",
     phone: "",
     address: "",
-    patientId: "",
-    doctorId: "",
-    appointmentDate: "",
+    patientId: item?.patient?.userId || "",
+    doctorId: item?.doctor?.userId || "",
+    appointmentDate: item?.appointmentDate ? item.appointmentDate.split('T')[0] : "",
     selectedDoctor: null
   });
   const [patients, setPatients] = useState([]);
@@ -78,6 +78,16 @@ function AdminModal({ type, item, onClose, onSuccess }) {
           doctorId: formData.doctorId,
           appointmentDateTime: appointmentDateTime
         });
+      } else if (type === "editAppointment") {
+        const appointmentDateTime = `${formData.appointmentDate}T09:00`;
+        await updateAppointment(item.appointmentId, {
+          patientId: item.patient.userId,
+          doctorId: item.doctor.userId,
+          appointmentDateTime: appointmentDateTime
+        });
+        if (formData.status && formData.status !== item.status) {
+          await updateAppointmentStatus(item.appointmentId, formData.status);
+        }
       } else if (type === "editUser" || type === "editDoctor") {
         await updateUser(item.userId, {
           name: formData.name,
@@ -133,8 +143,25 @@ function AdminModal({ type, item, onClose, onSuccess }) {
             availableTo: formData.availableTo
           });
         }
+      } else if (formData.role === "PATIENT") {
+        // Create patient using patient API
+        await createPatient({
+          age: parseInt(formData.age) || 0,
+          gender: formData.gender || "",
+          phone: formData.phone || "",
+          address: formData.address || "",
+          user: {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            role: "PATIENT"
+          }
+        });
       } else {
-        await registerUser(formData);
+        await registerUser({
+          ...formData,
+          role: formData.role || "PATIENT"
+        });
       }
       onSuccess();
     } catch (err) {
@@ -171,7 +198,52 @@ function AdminModal({ type, item, onClose, onSuccess }) {
         </div>
         
         <form onSubmit={handleSubmit}>
-          {type === "booking" ? (
+          {type === "editAppointment" ? (
+            <>
+              <div className="form-group">
+                <label>Patient</label>
+                <div style={{ padding: '0.875rem', background: 'rgba(51, 65, 85, 0.4)', borderRadius: '12px', color: '#cbd5e1' }}>
+                  {item?.patient?.name} - {item?.patient?.email}
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Doctor</label>
+                <div style={{ padding: '0.875rem', background: 'rgba(51, 65, 85, 0.4)', borderRadius: '12px', color: '#cbd5e1' }}>
+                  Dr. {item?.doctor?.name} - Specialization
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Token Number</label>
+                <div style={{ padding: '0.875rem', background: 'rgba(51, 65, 85, 0.4)', borderRadius: '12px', color: '#cbd5e1' }}>
+                  #{item?.tokenNumber}
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Appointment Date</label>
+                <input
+                  type="date"
+                  value={formData.appointmentDate}
+                  onChange={(e) => setFormData({...formData, appointmentDate: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  value={item?.status || 'BOOKED'}
+                  onChange={(e) => setFormData({...formData, status: e.target.value})}
+                >
+                  <option value="BOOKED">Booked</option>
+                  <option value="CANCELLED">Cancelled</option>
+                  <option value="DONE">Done</option>
+                </select>
+              </div>
+            </>
+          ) : (type === "booking") ? (
             <>
               <div className="form-group">
                 <label>Select Patient</label>
@@ -307,14 +379,47 @@ function AdminModal({ type, item, onClose, onSuccess }) {
                   </div>
                 </>
               )}
+              
+              {formData.role === "PATIENT" && (
+                <>
+                  <div className="form-row">
+                    <input
+                      type="number"
+                      placeholder="Age"
+                      value={formData.age}
+                      onChange={(e) => setFormData({...formData, age: e.target.value})}
+                    />
+                    <select
+                      value={formData.gender}
+                      onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                    >
+                      <option value="">Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <input
+                    type="tel"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  />
+                  <textarea
+                    placeholder="Address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                  />
+                </>
+              )}
             </>
           )}
           
           <div className="modal-actions">
             <button type="submit" className="btn-primary">
-              {type === "booking" ? "Book" : item ? "Update" : "Create"}
+              {type === "booking" ? "Book" : type === "editAppointment" ? "Update" : item ? "Update" : "Create"}
             </button>
-            {item && type !== "booking" && (
+            {item && type !== "booking" && type !== "editAppointment" && (
               <button type="button" onClick={handleDelete} className="btn-danger">
                 Delete
               </button>
