@@ -15,19 +15,6 @@ cd frontend
 npm install
 npm start
 ```
-Frontend runs on: http://localhost:3000
-
-## 🔐 Test Accounts
-
-**Doctor Login:**
-- Email: `doctor@medcare.com`
-- Password: `password123`
-
-**Patient Login:**
-- Email: `patient@medcare.com`  
-- Password: `password123`
-
-## 📱 Features Implemented
 
 ✅ **Patient Dashboard**
 - View current appointments
