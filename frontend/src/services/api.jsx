@@ -16,12 +16,14 @@ export const getDoctors = () => API.get("/doctors");
 export const getDoctorById = (id) => API.get(`/doctors/${id}`);
 export const getDoctorByUserId = (userId) => API.get(`/doctors/user/${userId}`);
 export const createDoctor = (doctorData) => API.post("/doctors", doctorData);
+export const deleteDoctor = (doctorId) => API.delete(`/doctors/${doctorId}`);
 
 // Patient endpoints
 export const getPatients = () => API.get("/patients");
 export const getPatientById = (id) => API.get(`/patients/${id}`);
 export const getPatientByUserId = (userId) => API.get(`/patients/user/${userId}`);
 export const createPatient = (patientData) => API.post("/patients", patientData);
+export const deletePatient = (patientId) => API.delete(`/patients/${patientId}`);
 
 // Appointment endpoints
 export const bookAppointment = (appointmentData) => 
@@ -43,6 +45,9 @@ export const updateAppointment = (appointmentId, appointmentData) =>
   API.put(`/appointments/${appointmentId}`, appointmentData);
 
 export const cancelAppointment = (appointmentId) => 
+  API.delete(`/appointments/${appointmentId}`);
+
+export const deleteAppointment = (appointmentId) => 
   API.delete(`/appointments/${appointmentId}`);
 
 export const getAllAppointments = () => API.get("/appointments");

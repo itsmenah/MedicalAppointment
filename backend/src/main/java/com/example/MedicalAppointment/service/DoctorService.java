@@ -44,4 +44,8 @@ public class DoctorService {
     public Optional<Doctor> getDoctorByUserId(Long userId) {
         return doctorRepository.findByUser_UserId(userId);
     }
+
+    public void deleteDoctor(Long id) {
+        doctorRepository.deleteById(id);
+    }
 }

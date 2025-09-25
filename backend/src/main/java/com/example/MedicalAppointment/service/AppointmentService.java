@@ -104,4 +104,8 @@ public class AppointmentService {
         appointment.setStatus(Status.CANCELLED);
         appointmentRepository.save(appointment);
     }
+
+    public void deleteAppointment(Long appointmentId) {
+        appointmentRepository.deleteById(appointmentId);
+    }
 }

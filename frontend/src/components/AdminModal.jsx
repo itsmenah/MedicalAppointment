@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { registerUser, createDoctor, getPatients, getDoctors, bookAppointment, updateAppointment, updateAppointmentStatus, updateUser, deleteUser, getPatientByUserId, getDoctorByUserId, createPatient } from "../services/api";
+import { registerUser, createDoctor, getPatients, getDoctors, bookAppointment, updateAppointment, updateAppointmentStatus, updateUser, deleteUser, getPatientByUserId, getDoctorByUserId, createPatient, deletePatient, deleteDoctor, getAllAppointments, deleteAppointment } from "../services/api";
 
 function AdminModal({ type, item, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -172,6 +172,30 @@ function AdminModal({ type, item, onClose, onSuccess }) {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
+        // Delete appointments first
+        const appointmentsRes = await getAllAppointments();
+        const userAppointments = appointmentsRes.data.filter(apt => 
+          apt.patient?.userId === item.userId || apt.doctor?.userId === item.userId
+        );
+        
+        for (const appointment of userAppointments) {
+          await deleteAppointment(appointment.appointmentId);
+        }
+        
+        // Delete patient/doctor record
+        if (item.role === "PATIENT") {
+          const patientRes = await getPatientByUserId(item.userId);
+          if (patientRes.data) {
+            await deletePatient(patientRes.data.patientId);
+          }
+        } else if (item.role === "DOCTOR") {
+          const doctorRes = await getDoctorByUserId(item.userId);
+          if (doctorRes.data) {
+            await deleteDoctor(doctorRes.data.doctorId);
+          }
+        }
+        
+        // Finally delete user
         await deleteUser(item.userId);
         onSuccess();
       } catch (err) {

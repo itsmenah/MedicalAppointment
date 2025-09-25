@@ -20,6 +20,12 @@ public class UserService {
     @Autowired
     private PatientRepo patientRepository;
 
+    @Autowired
+    private com.example.MedicalAppointment.repository.DoctorRepo doctorRepository;
+
+    @Autowired
+    private com.example.MedicalAppointment.repository.AppointmentRepo appointmentRepository;
+
 
     public User registerUser(User user) {
         // (Optional) Encrypt password before saving

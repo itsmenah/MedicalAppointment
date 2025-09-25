@@ -74,6 +74,12 @@ public class AppointmentController {
     }
 
     @DeleteMapping("/{appointmentId}")
+    public ResponseEntity<String> deleteAppointment(@PathVariable Long appointmentId) {
+        appointmentService.deleteAppointment(appointmentId);
+        return ResponseEntity.ok("Appointment deleted successfully");
+    }
+
+    @PutMapping("/{appointmentId}/cancel")
     public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId) {
         appointmentService.cancelAppointment(appointmentId);
         return ResponseEntity.ok("Appointment canceled successfully");
