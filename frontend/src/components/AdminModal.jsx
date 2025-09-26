@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { registerUser, createDoctor, getPatients, getDoctors, bookAppointment, updateAppointment, updateAppointmentStatus, updateUser, deleteUser, getPatientByUserId, getDoctorByUserId, createPatient, deletePatient, deleteDoctor, getAllAppointments, deleteAppointment } from "../services/api";
+import { registerUser, createDoctor, updateDoctor, updatePatient, getPatients, getDoctors, bookAppointment, updateAppointment, updateAppointmentStatus, updateUser, deleteUser, getPatientByUserId, getDoctorByUserId, createPatient, deletePatient, deleteDoctor, getAllAppointments, deleteAppointment } from "../services/api";
 
 function AdminModal({ type, item, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     name: item?.name || item?.user?.name || item?.patient?.name || item?.doctor?.name || "",
     email: item?.email || item?.user?.email || item?.patient?.email || item?.doctor?.email || "",
     password: "",
-    role: item?.role || (type === "doctor" || type === "editDoctor" ? "DOCTOR" : "PATIENT"),
+    role: item?.role || item?.user?.role || (type === "doctor" || type === "editDoctor" ? "DOCTOR" : "PATIENT"),
     specialization: item?.specialization || "",
     availableFrom: item?.availableFrom || "09:00",
     availableTo: item?.availableTo || "17:00",
@@ -19,6 +19,8 @@ function AdminModal({ type, item, onClose, onSuccess }) {
     appointmentDate: item?.appointmentDate ? item.appointmentDate.split('T')[0] : "",
     selectedDoctor: null
   });
+
+  console.log('AdminModal - item:', item, 'type:', type, 'formData:', formData);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [userDetails, setUserDetails] = useState(null);
@@ -88,10 +90,11 @@ function AdminModal({ type, item, onClose, onSuccess }) {
         if (formData.status && formData.status !== item.status) {
           await updateAppointmentStatus(item.appointmentId, formData.status);
         }
-      } else if (type === "editUser" || type === "editDoctor") {
+      } else if (type === "editUser") {
         await updateUser(item.userId, {
           name: formData.name,
           email: formData.email,
+          role: item.role,
           ...(formData.password && { password: formData.password })
         });
         
@@ -99,8 +102,7 @@ function AdminModal({ type, item, onClose, onSuccess }) {
           try {
             if (userDetails) {
               // Update existing patient
-              // Update patient details would need updatePatient API
-              console.log("Patient update not implemented", {
+              await updatePatient(userDetails.patientId, {
                 age: parseInt(formData.age) || userDetails.age,
                 gender: formData.gender || userDetails.gender,
                 phone: formData.phone || userDetails.phone,
@@ -123,12 +125,27 @@ function AdminModal({ type, item, onClose, onSuccess }) {
       } else if (type === "doctor" || type === "editDoctor") {
         if (type === "editDoctor") {
           // Update existing doctor
-          await updateUser(item.user.userId, {
-            name: formData.name,
-            email: formData.email,
-            ...(formData.password && { password: formData.password })
-          });
-          // Note: Doctor specialization/timing update would need updateDoctor API
+          const userId = item.user?.userId;
+          const doctorId = item.doctorId;
+          
+          console.log('Doctor update - userId:', userId, 'doctorId:', doctorId, 'item:', item);
+          
+          if (userId && userId !== 'undefined') {
+            await updateUser(userId, {
+              name: formData.name,
+              email: formData.email,
+              role: item.user.role,
+              ...(formData.password && { password: formData.password })
+            });
+          }
+          
+          if (doctorId && doctorId !== 'undefined') {
+            await updateDoctor(doctorId, {
+              specialization: formData.specialization,
+              availableFrom: formData.availableFrom,
+              availableTo: formData.availableTo
+            });
+          }
         } else {
           // Create new doctor using createDoctor service which handles both user and doctor creation
           await createDoctor({
@@ -188,15 +205,15 @@ function AdminModal({ type, item, onClose, onSuccess }) {
           if (patientRes.data) {
             await deletePatient(patientRes.data.patientId);
           }
-        } else if (item.role === "DOCTOR") {
-          const doctorRes = await getDoctorByUserId(item.userId);
-          if (doctorRes.data) {
-            await deleteDoctor(doctorRes.data.doctorId);
+        } else if (item.role === "DOCTOR" || item.user?.role === "DOCTOR") {
+          const doctorId = item.doctorId || (await getDoctorByUserId(item.userId || item.user?.userId)).data?.doctorId;
+          if (doctorId) {
+            await deleteDoctor(doctorId);
           }
         }
         
         // Finally delete user
-        await deleteUser(item.userId);
+        await deleteUser(item.userId || item.user?.userId);
         onSuccess();
       } catch (err) {
         console.error("Failed to delete", err);
@@ -206,7 +223,10 @@ function AdminModal({ type, item, onClose, onSuccess }) {
 
   const getTitle = () => {
     if (type === "booking") return "Book Appointment";
-    if (type === "editUser") return "Edit User";
+    if (type === "editAppointment") return "Edit Appointment";
+    if (type === "editUser") {
+      return item?.role === "PATIENT" ? "Edit Patient" : "Edit User";
+    }
     if (type === "editDoctor") return "Edit Doctor";
     return type === "doctor" ? "Add Doctor" : "Add User";
   };
@@ -404,7 +424,7 @@ function AdminModal({ type, item, onClose, onSuccess }) {
                 </>
               )}
               
-              {formData.role === "PATIENT" && (
+              {(formData.role === "PATIENT" || item?.role === "PATIENT") && type !== "editUser" && (
                 <>
                   <div className="form-row">
                     <input

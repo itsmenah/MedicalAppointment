@@ -43,7 +43,12 @@ function Register() {
       });
       navigate("/", { state: { message: "Registration successful! Please login." } });
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      const errorMessage = err.response?.data?.message || "Registration failed";
+      if (errorMessage.includes("already registered")) {
+        setError("User already registered. Please proceed to login.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

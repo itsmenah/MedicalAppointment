@@ -45,6 +45,17 @@ public class DoctorService {
         return doctorRepository.findByUser_UserId(userId);
     }
 
+    public Doctor updateDoctor(Long id, Doctor doctorDetails) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+        
+        doctor.setSpecialization(doctorDetails.getSpecialization());
+        doctor.setAvailableFrom(doctorDetails.getAvailableFrom());
+        doctor.setAvailableTo(doctorDetails.getAvailableTo());
+        
+        return doctorRepository.save(doctor);
+    }
+
     public void deleteDoctor(Long id) {
         doctorRepository.deleteById(id);
     }

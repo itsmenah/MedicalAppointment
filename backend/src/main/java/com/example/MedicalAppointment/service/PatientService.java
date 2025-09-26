@@ -23,6 +23,12 @@ public class PatientService {
 
     public Patient createPatient(Patient patient) {
         User user = patient.getUser();
+        
+        // Check if email already exists
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("User already registered. Please proceed to login.");
+        }
+        
         user.setRole(Role.PATIENT); // Force PATIENT role
         userRepository.save(user);
 
@@ -66,12 +72,14 @@ public class PatientService {
                 existingUser.setName(updatedUser.getName());
                 existingUser.setEmail(updatedUser.getEmail());
                 existingUser.setPassword(updatedUser.getPassword());
+                existingUser.setRole(updatedUser.getRole());
             }
 
             userRepository.save(existingUser);
             return patientRepository.save(existingPatient);
         });
     }
+
 
     public void deletePatient(Long id) {
         patientRepository.deleteById(id);

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../services/api";
 
 function Login({ onLogin }) {
@@ -8,22 +8,36 @@ function Login({ onLogin }) {
     password: ""
   });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccess(location.state.message);
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Only clear error messages when user starts typing
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess(""); // Clear success message on login attempt
 
     try {
       const response = await loginUser(formData);
+      // Clear location state to prevent message from showing after logout
+      navigate("/", { replace: true, state: null });
       onLogin(response.data);
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
@@ -40,6 +54,7 @@ function Login({ onLogin }) {
       </div>
 
       {error && <div className="error">{error}</div>}
+      {success && <div className="success">{success}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -75,6 +90,15 @@ function Login({ onLogin }) {
         <Link to="/register" className="link">
           Don't have an account? Sign up
         </Link>
+        <br />
+        <button 
+          type="button" 
+          className="link" 
+          style={{ background: 'none', border: 'none', marginTop: '0.5rem', cursor: 'pointer' }}
+          onClick={() => alert('Please contact admin to change your password')}
+        >
+          Forgot Password?
+        </button>
       </div>
     </div>
   );

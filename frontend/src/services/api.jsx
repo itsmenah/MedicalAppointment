@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://medicalappointment-l2hk.onrender.com/api/",
+  baseURL: "http://localhost:8080/api/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -16,13 +16,25 @@ export const getDoctors = () => API.get("/doctors");
 export const getDoctorById = (id) => API.get(`/doctors/${id}`);
 export const getDoctorByUserId = (userId) => API.get(`/doctors/user/${userId}`);
 export const createDoctor = (doctorData) => API.post("/doctors", doctorData);
-export const deleteDoctor = (doctorId) => API.delete(`/doctors/${doctorId}`);
+export const updateDoctor = (doctorId, doctorData) => {
+  if (!doctorId || doctorId === 'undefined') {
+    return Promise.reject(new Error('Invalid doctor ID'));
+  }
+  return API.put(`/doctors/${doctorId}`, doctorData);
+};
+export const deleteDoctor = (doctorId) => {
+  if (!doctorId || doctorId === 'undefined') {
+    return Promise.reject(new Error('Invalid doctor ID'));
+  }
+  return API.delete(`/doctors/${doctorId}`);
+};
 
 // Patient endpoints
 export const getPatients = () => API.get("/patients");
 export const getPatientById = (id) => API.get(`/patients/${id}`);
 export const getPatientByUserId = (userId) => API.get(`/patients/user/${userId}`);
 export const createPatient = (patientData) => API.post("/patients", patientData);
+export const updatePatient = (patientId, patientData) => API.put(`/patients/${patientId}`, patientData);
 export const deletePatient = (patientId) => API.delete(`/patients/${patientId}`);
 
 // Appointment endpoints
@@ -55,8 +67,18 @@ export const getAllAppointments = () => API.get("/appointments");
 // User endpoints
 export const getAllUsers = () => API.get("/users");
 export const getUserById = (id) => API.get(`/users/${id}`);
-export const updateUser = (id, userData) => API.put(`/users/${id}`, userData);
-export const deleteUser = (id) => API.delete(`/users/${id}`);
+export const updateUser = (id, userData) => {
+  if (!id || id === 'undefined') {
+    return Promise.reject(new Error('Invalid user ID'));
+  }
+  return API.put(`/users/${id}`, userData);
+};
+export const deleteUser = (id) => {
+  if (!id || id === 'undefined') {
+    return Promise.reject(new Error('Invalid user ID'));
+  }
+  return API.delete(`/users/${id}`);
+};
 export const findUserByEmail = (email) => API.get(`/users/find?email=${email}`);
 
 export default API;

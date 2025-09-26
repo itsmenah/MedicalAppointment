@@ -28,6 +28,11 @@ public class UserService {
 
 
     public User registerUser(User user) {
+        // Check if email already exists
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("User already registered. Please proceed to login.");
+        }
+        
         // (Optional) Encrypt password before saving
         // user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
@@ -69,7 +74,10 @@ public class UserService {
 
         user.setName(updatedUser.getName());
         user.setEmail(updatedUser.getEmail());
-        user.setRole(updatedUser.getRole());
+        // Only update role if provided and not null
+        if (updatedUser.getRole() != null) {
+            user.setRole(updatedUser.getRole());
+        }
         // Update password only if provided
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
             user.setPassword(updatedUser.getPassword());
